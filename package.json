@@ -1,0 +1,34 @@
+{
+	"name": "obsidian-cm6-attributes",
+	"version": "0.0.1",
+	"description": "This is an experimental attributes plugin for CM6. Use with caution as it is very alpha.",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "node esbuild.config.mjs production"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "MIT",
+	"devDependencies": {
+		"@codemirror/rangeset": "^0.19.0",
+		"@codemirror/state": "^0.19.0",
+		"@codemirror/view": "^0.19.0",
+		"@codemirror/commands": "^0.19.0",
+		"@codemirror/fold": "0.19.0",
+		"@codemirror/history": "^0.19.0",
+		"@codemirror/language": "^0.19.0",
+		"@codemirror/matchbrackets": "^0.19.0",
+		"@codemirror/panel": "^0.19.0",
+		"@codemirror/search": "^0.19.0",
+		"@codemirror/stream-parser": "https://github.com/lishid/stream-parser",
+		"@types/node": "^16.11.6",
+		"@typescript-eslint/eslint-plugin": "^5.2.0",
+		"@typescript-eslint/parser": "^5.2.0",
+		"builtin-modules": "^3.2.0",
+		"esbuild": "0.13.12",
+		"obsidian": "^0.13.8",
+		"tslib": "2.3.1",
+		"typescript": "4.4.4"
+	}
+}
