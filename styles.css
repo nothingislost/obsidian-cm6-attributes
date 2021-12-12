@@ -2,3 +2,12 @@
   cursor: pointer;
   margin-left: -0.8em;
 }
+
+.markdown-source-view.mod-cm6 .cm-gutters {
+    /* hack to get our fold widget to show up when at the beginning of a line */
+    /* z-index: -1; */ /* this is bad. don't do this */
+}
+
+.cm-foldGutter {
+    display: none;
+}

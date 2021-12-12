@@ -16,18 +16,21 @@ export default class AttributesPlugin extends Plugin {
   buildAttributesViewPlugin() {
     // build the DOm element that we'll prepend to list elements
     class FoldWidget extends WidgetType {
-      constructor() {
+      isFolded: boolean;
+
+      constructor(isFolded: boolean) {
         super();
+        this.isFolded = isFolded;
       }
 
       eq(other: FoldWidget) {
-        return other == this;
+        return other.isFolded == this.isFolded;
       }
 
       toDOM() {
         let el = document.createElement("span");
         el.className = "cm-list-widget";
-        el.textContent = "▾"; // "▸";
+        el.textContent = this.isFolded ? "▸" : "▾";
         return el;
       }
 
@@ -49,6 +52,19 @@ export default class AttributesPlugin extends Plugin {
         update(update: ViewUpdate) {
           if (update.docChanged || update.viewportChanged) {
             this.decorations = this.buildDecorations(update.view);
+          } else if (update.geometryChanged) {
+            // this logic is to update the fold widget icons since a fold
+            // does not trigger docChanged or viewportChanged
+            // there's probably a better way to do this
+            for (let tr of update.transactions) {
+              for (let effect of tr.effects) {
+                if (effect && effect.value) {
+                  if (effect.is(foldEffect) || effect.is(unfoldEffect)) {
+                    this.decorations = this.buildDecorations(update.view);
+                  }
+                }
+              }
+            }
           }
         }
 
@@ -71,20 +87,23 @@ export default class AttributesPlugin extends Plugin {
                   // custom stream-parser package. See the readme for more details.
 
                   const tokenProps = type.prop(tokenClassNodeProp);
+
                   if (tokenProps) {
                     const props = new Set(tokenProps.split(" "));
                     const isTag = props.has("hashtag-end");
                     const isList = props.has("formatting-list");
+                    const isHeader = props.has("formatting-header");
                     const isBarelink = props.has("hmd-barelink") && !props.has("formatting");
-                    if (isList) {
+
+                    if (isList || isHeader) {
                       // add a fold icon, inline, next to every foldable list item
-                      // TODO: make the fold icon reflect fold status
                       // TODO: fix the naive negative margin in styles.css
-                      let line = view.state.doc.lineAt(from);
-                      if (foldable(view.state, line.from, line.to)) {
+                      let range,
+                        line = view.state.doc.lineAt(from);
+                      if ((range = foldable(view.state, line.from, line.to))) {
+                        const isFolded = foldExists(view.state, range.from, range.to);
                         let deco = Decoration.widget({
-                          widget: new FoldWidget(),
-                          side: 0,
+                          widget: new FoldWidget(isFolded),
                         });
                         builder.add(from, from, deco);
                       }
@@ -98,6 +117,13 @@ export default class AttributesPlugin extends Plugin {
                       let deco = Decoration.line({
                         attributes: { "data-tags": line.text.match(hashTagRegexp)?.join(" ").replace(/#/g, "") },
                       });
+                      // TODO: Figure out a better way to fix the pos conflict when
+                      //       a top level list item has a hashtag at the beginning of the line
+                      // The code below is a hack using internal class properties
+                      if ((<any>builder).lastFrom == line.from) {
+                        // if we don't do this, we get an error stating our rangeset is not sorted
+                        deco.startSide = (<any>builder).last.startSide + 1;
+                      }
                       builder.add(line.from, line.from, deco);
                     }
                     if (isBarelink) {
