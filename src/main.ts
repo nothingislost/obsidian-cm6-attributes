@@ -1,11 +1,12 @@
-import { Plugin } from "obsidian";
+import { Plugin, setIcon } from "obsidian";
 import { RangeSetBuilder } from "@codemirror/rangeset";
 import { EditorView, Decoration, DecorationSet, ViewUpdate, WidgetType, ViewPlugin } from "@codemirror/view";
 import { EditorState, EditorSelection, TransactionSpec } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
 import { tokenClassNodeProp } from "@codemirror/stream-parser";
-import { foldable } from "@codemirror/language";
+import { foldable  } from "@codemirror/language";
 import { foldEffect, unfoldEffect, foldedRanges } from "@codemirror/fold";
+
 
 export default class AttributesPlugin extends Plugin {
   async onload() {
@@ -17,10 +18,12 @@ export default class AttributesPlugin extends Plugin {
     // build the DOm element that we'll prepend to list elements
     class FoldWidget extends WidgetType {
       isFolded: boolean;
+      isHeader: boolean;
 
-      constructor(isFolded: boolean) {
+      constructor(isFolded: boolean, isHeader: boolean = false) {
         super();
         this.isFolded = isFolded;
+        this.isHeader = isHeader;
       }
 
       eq(other: FoldWidget) {
@@ -28,9 +31,11 @@ export default class AttributesPlugin extends Plugin {
       }
 
       toDOM() {
-        let el = document.createElement("span");
-        el.className = "cm-list-widget";
-        el.textContent = this.isFolded ? "▸" : "▾";
+        let el = document.createElement("div");
+        el.className = "cm-fold-widget collapse-indicator collapse-icon";
+        if (this.isFolded) el.addClass("is-collapsed");
+        this.isHeader ? el.addClass("heading-collapse-indicator") : el.addClass("list-collapse-indicator");
+        setIcon(el, "right-triangle", 8);
         return el;
       }
 
@@ -103,7 +108,7 @@ export default class AttributesPlugin extends Plugin {
                       if ((range = foldable(view.state, line.from, line.to))) {
                         const isFolded = foldExists(view.state, range.from, range.to);
                         let deco = Decoration.widget({
-                          widget: new FoldWidget(isFolded),
+                          widget: new FoldWidget(isFolded, isHeader),
                         });
                         builder.add(from, from, deco);
                       }
@@ -155,9 +160,9 @@ export default class AttributesPlugin extends Plugin {
         eventHandlers: {
           // create an event handler for our new fold widget
           mousedown: (e, view) => {
-            // TODO: move the cursor to the end of the folded range
-            let target = e.target as HTMLElement;
-            if (target.nodeName == "SPAN" && target.classList.contains("cm-list-widget")) {
+            // TODO: only act on left click
+            let target = (e.target as HTMLElement).closest(".cm-fold-widget");
+            if (target) {
               const foldMarkerPos = view.posAtDOM(target);
               const line = view.state.doc.lineAt(foldMarkerPos);
               let range = foldable(view.state, line.from, line.to);

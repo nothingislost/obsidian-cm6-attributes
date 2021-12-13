@@ -1,7 +1,7 @@
 {
   "id": "obsidian-cm6-attributees",
   "name": "CM6 Attributees",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "minAppVersion": "0.13.8",
   "description": "This is an experimental attributes plugin for CM6. Use with caution as it is very alpha.",
   "author": "NothingIsLost",
