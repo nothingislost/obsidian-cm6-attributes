@@ -1,29 +1,38 @@
 .cm-list-widget {
-    cursor: pointer;
-    margin-left: -0.8em;
-  }
-  
-  .markdown-source-view.mod-cm6 .cm-gutters {
-    /* hack to get our fold widget to show up when at the beginning of a line */
-    z-index: -1; /* this is bad. don't do this */
-  }
-  
-  .cm-editor .cm-foldGutter {
-    display: none !important;
-  }
-  
-  .cm-list-widget.collapse-indicator {
-    display: inline-block;
-    float: left;
-    color: var(--text-muted);
-    cursor: pointer;
-  }
-  .cm-list-widget.list-collapse-indicator {
-    margin-left: -24px;
-    /* padding: 0 8px; */
-  }
-  .cm-list-widget.heading-collapse-indicator {
-    margin-left: -24px;
-    /* padding: 0 8px; */
-  }
-  
+  cursor: pointer;
+  margin-left: -0.8em;
+}
+
+/* .markdown-source-view.mod-cm6 .cm-gutters { */
+/* hack to get our fold widget to show up when at the beginning of a line */
+/* z-index: -1; 
+} */
+
+.cm-line::before {
+  margin-left: 1em;
+  content: "";
+}
+
+.cm-editor .cm-foldGutter {
+  display: none !important;
+}
+
+.cm-fold-widget.collapse-indicator {
+  display: inline-block;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.is-collapsed.collapse-icon svg {
+  transform: rotate(-90deg);
+}
+
+.cm-fold-widget {
+  position: relative;
+}
+
+.cm-fold-widget svg {
+  position: absolute;
+  top: -0.6rem;
+  left: -12px;
+}
