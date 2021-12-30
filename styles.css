@@ -3,18 +3,16 @@
   margin-left: -0.8em;
 }
 
-/* .markdown-source-view.mod-cm6 .cm-gutters { */
-/* hack to get our fold widget to show up when at the beginning of a line */
-/* z-index: -1; 
-} */
-
-.cm-line::before {
-  margin-left: 1em;
-  content: "";
+.cm-lineNumbers {
+  padding-right: .5em;
 }
 
 .cm-editor .cm-foldGutter {
-  display: none !important;
+  opacity: 0;
+}
+
+.cm-editor .cm-gutters {
+  z-index: 0;
 }
 
 .cm-fold-widget.collapse-indicator {
